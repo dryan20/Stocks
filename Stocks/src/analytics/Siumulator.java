@@ -18,7 +18,7 @@ public class Siumulator {
 	}
 
 	public void checkBuySellByDay(int buy, int sell) {
-		checkBuySellByDay(new BigDecimal("1000"), buy, sell);
+		checkBuySellByDay(new BigDecimal("10000"), buy, sell);
 	}
 
 	public void checkBuySellByDay(BigDecimal capital, int buy, int sell) {
@@ -26,10 +26,10 @@ public class Siumulator {
 		System.out.println("--------------------------------------------------------");
 		System.out.println("Buy: " + buy + " | Sell: " + sell);
 
-		// getIdeal(capital, buy, sell);
-		// getCapFirstPrice(capital, buy, sell);
-		// getCapLastPrice(capital, buy, sell);
-		// getBuyFirstSellLastPrice(capital, buy, sell);
+		//getIdeal(capital, buy, sell);
+		//getCapFirstPrice(capital, buy, sell);
+		//getCapLastPrice(capital, buy, sell);
+		//getBuyFirstSellLastPrice(capital, buy, sell);
 		getBuyLastSellFirstPrice(capital, buy, sell);
 	}
 
@@ -191,22 +191,26 @@ public class Siumulator {
 	private void getBuyLastSellFirstPrice(BigDecimal capital, int buy, int sell) {
 		HashMap<Integer, TagKurs> map = chart.getChart();
 		BigDecimal buyValue = new BigDecimal("0");
+		BigDecimal invest = BigDecimal.ZERO;
+		BigDecimal outPut = BigDecimal.ZERO;
 		boolean isBuy = false;
 		int trades = 0;
 		for (int i = 0; i < map.size(); i++) {
 			TagKurs kurs = map.get(i);
 			if (kurs.getDayI() == buy && !isBuy) {
 				buyValue = capital.divide(kurs.getLastPrice(), 0, RoundingMode.DOWN);
-				capital = capital.subtract(buyValue.multiply(kurs.getLastPrice()));
+				invest = buyValue.multiply(kurs.getLastPrice());
+				capital = capital.subtract(invest);
 				isBuy = true;
-				// System.out.println("Kapital: " + capital + " | " + "Aktien: "
+				int nextTrade = trades + 1;
+				System.out.println("Trade: " + nextTrade + " " + kurs.getDateDay() + "." + kurs.getDateMonth() + "." + kurs.getDateYear() + " | " + invest);
 				// + buyValue);
 			} else if (kurs.getDayI() == sell && isBuy) {
-				capital = capital.add(buyValue.multiply(kurs.getFirstPrice()));
-				buyValue = new BigDecimal("0");
+				outPut = buyValue.multiply(kurs.getFirstPrice());
+				capital = capital.add(outPut);
 				isBuy = false;
 				trades++;
-				System.out.println("Trade: " + trades + " | " + capital);
+				System.out.println("Trade: " + trades + " " + kurs.getDateDay() + "." + kurs.getDateMonth() + "." + kurs.getDateYear() + " | " + capital + " => " + outPut.subtract(invest));
 			}
 			// Letzer Tag Verkauf
 			if (i == map.size() - 1 && isBuy) {
@@ -214,7 +218,7 @@ public class Siumulator {
 				buyValue = new BigDecimal("0");
 				isBuy = false;
 				trades++;
-				System.out.println("Trade: " + trades + " | " + capital);
+				System.out.println("Trade: " + trades + " " + kurs.getDateDay() + "." + kurs.getDateMonth() + "." + kurs.getDateYear() + "." + " | " + capital);
 			}
 		}
 		addResultMap("BLSF-" + buy + sell, capital);
