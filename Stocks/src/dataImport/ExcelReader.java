@@ -1,4 +1,4 @@
-package dateImport;
+package dataImport;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
